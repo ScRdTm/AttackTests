@@ -1,1 +1,0 @@
-Wscript.echo "This is a malicious file!"
